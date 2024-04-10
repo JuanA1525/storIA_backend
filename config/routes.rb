@@ -11,6 +11,8 @@ Rails.application.routes.draw do
       post "sign_in", to: "session#create"
 
       delete "logout", to: "session#destroy"
+
+      get "global_numbers", to: "session#global_numbers"
     end
   end
 

@@ -1,6 +1,6 @@
 class Api::V1::SessionController < ApplicationController
     
-    skip_before_action :authenticate_request, only: [:create]
+    skip_before_action :authenticate_request, only: [:create, :global_numbers]
     
     def destroy
         session[:user_id] = nil
@@ -15,5 +15,14 @@ class Api::V1::SessionController < ApplicationController
         else
             render json: { errors: "Invalid email or password" }, status: :unauthorized
         end
+    end
+
+    def global_numbers
+        render json: 
+        {
+            num_stories: 12500000,
+            num_users: 142384,
+            num_characters: 598000
+        }
     end
 end 

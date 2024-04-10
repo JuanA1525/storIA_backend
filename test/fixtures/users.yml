@@ -3,13 +3,13 @@
 one:
   name: MyString
   last_name: MyString
-  password: MyString
-  birth_date: 2024-04-08
+  password_digest: MyString
+  birth_date: 2024-04-09
   mail: MyString
 
 two:
   name: MyString
   last_name: MyString
-  password: MyString
-  birth_date: 2024-04-08
+  password_digest: MyString
+  birth_date: 2024-04-09
   mail: MyString

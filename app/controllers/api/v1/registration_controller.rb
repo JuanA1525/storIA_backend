@@ -14,7 +14,7 @@ class Api::V1::RegistrationController < ApplicationController
             token = jwt_encode(user_id: @user.id)
             render json: { token: token }, status: :ok
         else
-            render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+            render json: { errors: @user.errors.full_messages }, status: :unauthorized
         end
     end
 

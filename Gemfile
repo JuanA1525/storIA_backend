@@ -1,13 +1,15 @@
 source "https://rubygems.org"
 
-ruby "3.2.3"
+ruby "3.3.1"
 gem 'active_model_serializers', '~> 0.10.14'
-
+gem 'async'
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3", ">= 7.1.3.2"
 
 # Use sqlite3 as the database for Active Record
-gem "sqlite3", "~> 1.4"
+#gem "sqlite3", "~> 1.4"
+#gem 'db-mariadb', '~> 0.10.0'
+gem 'mysql2'
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"

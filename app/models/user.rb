@@ -1,6 +1,9 @@
 class User < ApplicationRecord
     has_secure_password
-  
+    has_many :stories
+    has_many :characters
+    has_many :reviews
+
     # Validaciones para mail
     validates :mail, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "Debe ser un correo válido." }
     normalizes :mail, with: -> (value) { value.strip.downcase }

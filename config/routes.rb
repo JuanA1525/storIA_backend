@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       delete "logout", to: "session#destroy"
 
       get "global_numbers", to: "session#global_numbers"
+
+      post "create_character", to: "character#create"
     end
   end
 

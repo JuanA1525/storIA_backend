@@ -3,7 +3,7 @@ class Api::V1::CharacterController < ApplicationController
     def create
         prompt = generate_prompt(character_params)
         response = ChatGPTService.new(message: prompt).call(:tp_create_character)
-        
+                
         character = Character.new(
             name: character_params[:name],
             description: response,
@@ -12,14 +12,15 @@ class Api::V1::CharacterController < ApplicationController
         )
 
         if character.save
-            render json: { character: character, ai_response: response }
+            render json: { character: character}
         else
             render json: { errors: character.errors }, status: :unprocessable_entity
         end
-    end
+    end    
     
+
+
     private
-    
     def character_params
         params.require(:character).permit(:name, :birth_date, :context, :appearance, :outfit, :personality, :history, :powers, :hobbies, :fears, :goals, :relationships, :enemies, :allies, :other)
     end

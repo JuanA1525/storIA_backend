@@ -15,11 +15,11 @@ class ChatGPTService
         messages << {role: "user", content: message}
         
         response = test_response
-
+        #response = test_response(messages)
+        response
     end
 
     private
-
     def client
         @_client ||= OpenAI::Client.new(
             access_token: Rails.application.credentials.open_ai_api_key,
@@ -35,17 +35,29 @@ class ChatGPTService
             ]
         when :tp_create_scene
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increibles. Di si o no.",
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increible. Di si o no.",
             ]
         when :tp_create_character
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increibles. Di si o no.",
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increible. Di si o no.",
+            ]
+        when :tp_create_history
+            [
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear historias con personajes dados de manera increible. Di si o no.",
             ]
         else
             [
                 "Eres un escritor y creador de cuentos supremamente creativo."
             ]
         end
+    end
+
+    def training_prompts(prompt_type, character)
+        case prompt_type
+        when :tp_actlike
+            [
+                "Eres: " + character + ". Actua como tal."
+            ]
     end
 
     def test_response
@@ -79,13 +91,15 @@ class ChatGPTService
     end
 
     def test_response(messages)
-    response = client.chat(
-        parameters{
-            model: "gpt-3.5-turbo",
-            messages: messages
-            temperature: 0.7,
-        }
-    )
+        response = client.chat(
+            parameters{
+                model: "gpt-3.5-turbo",
+                messages: messages,
+                temperature: 0.7,
+            }
+        )
 
-    puts.response.dig("choices", 0, "message", "content")
+        puts.response.dig("choices", 0, "message", "content")
+        response.dig("choices", 0, "message", "content")
+    end
 end

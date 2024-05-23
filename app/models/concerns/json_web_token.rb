@@ -14,7 +14,6 @@ module JsonWebToken
     def jwt_decode(token)
         decoded = JWT.decode(token, SECRET_KEY).first
         decoded = HashWithIndifferentAccess.new(decoded)
-        puts "-----> Decoded in JsonWebToken: #{decoded.inspect}"
         decoded
     end
 end

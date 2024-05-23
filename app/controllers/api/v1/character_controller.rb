@@ -1,8 +1,6 @@
 class Api::V1::CharacterController < ApplicationController
     
     def create
-        puts("----> Current User in CharController: #{@current_user.inspect}")
-        puts("----> Current User.id in CharController: #{@current_user.id}")
         prompt = generate_prompt(character_params)
         response = ChatGPTService.new(message: prompt).call(:tp_create_character)
         

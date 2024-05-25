@@ -3,23 +3,19 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users
-
+      #Registration
       get "sign_up", to: "registration#new"
       post "sign_up", to: "registration#create"
-
+      #Session
       get "sign_in", to: "session#new"
       post "sign_in", to: "session#create"
-
       delete "logout", to: "session#destroy"
-
       get "global_numbers", to: "session#global_numbers"
-
+      #Character
       post "create_character", to: "character#create"
-
-      get "all_characters", to: "character#user_characters" 
-
+      get "all_characters", to: "character#index" 
+      get "character", to: "character#show" 
       post "update_character", to: "character#update"   
-      
       delete "delete_character", to: "character#destroy"
 
     end

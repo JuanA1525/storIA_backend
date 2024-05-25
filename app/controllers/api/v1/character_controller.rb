@@ -22,7 +22,7 @@ class Api::V1::CharacterController < ApplicationController
 
     # observe all user characters
     def index
-      characters = current_user.characters
+      characters = @current_user.characters.where(state: true)
       if characters.present?
         render json: characters, status: :ok
       else
@@ -33,7 +33,7 @@ class Api::V1::CharacterController < ApplicationController
 
     # observe the information of a specific character
     def show
-      if @character
+      if @character.state==true
         render json: @character, status: :ok
       else
         render json: { error: 'Character not found' }, status: :not_found
@@ -42,12 +42,16 @@ class Api::V1::CharacterController < ApplicationController
 
 
     def update
-      if @character.update(character_params)
-        render json: { character: @character }, status: :ok
+      if @character.state == true
+        if @character.update(character_params_update)
+          render json: { character: @character }, status: :ok
+        else
+          render json: { errors: @character.errors }, status: :unprocessable_entity
+        end
       else
-        render json: { errors: @character.errors }, status: :unprocessable_entity
+        render json: { error: 'Character is not founded' }, status: :forbidden
       end
-    end 
+    end
 
 
     def destroy
@@ -62,12 +66,16 @@ class Api::V1::CharacterController < ApplicationController
     
     private
     def set_character
-      @character = current_user.characters.find_by(id: params[:id])
+      @character = @current_user.characters.find_by(id: params[:id])
       render json: { error: "Character not found" }, status: :not_found unless @character
     end
 
     def character_params
         params.require(:character).permit(:name, :birth_date, :context, :appearance, :outfit, :personality, :history, :powers, :hobbies, :fears, :goals, :relationships, :enemies, :allies, :other)
+    end
+
+    def character_params_update
+      params.require(:character).permit(:name, :description)
     end
     
     def generate_prompt(character_params)

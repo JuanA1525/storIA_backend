@@ -1,5 +1,6 @@
 class Api::V1::CharacterController < ApplicationController
-    before_action :set_character, only: [:update, :destroy] 
+    before_action :set_character, only: [:update, :destroy, :show] 
+
     def create
         prompt = generate_prompt(character_params)
         response = ChatGPTService.new(message: prompt).call(:tp_create_character)
@@ -18,29 +19,34 @@ class Api::V1::CharacterController < ApplicationController
         end
     end    
 
-    def user_characters
-        characters = @current_user.characters
-    
-        if characters.present?
-          render json: characters, status: :ok
-        else
-          render json: { error: 'No characters found for the current user' }, status: :not_found
-        end
+
+    # observe all user characters
+    def index
+      characters = current_user.characters
+      if characters.present?
+        render json: characters, status: :ok
+      else
+        render json: { error: 'No characters found for the current user' }, status: :not_found
+      end
     end
-    
+
+
+    # observe the information of a specific character
+    def show
+      if @character
+        render json: @character, status: :ok
+      else
+        render json: { error: 'Character not found' }, status: :not_found
+      end
+    end
+
 
     def update
-        if @character.update(character_params)
-          # Solo generar un nuevo prompt si hay cambios en los campos relevantes
-          if character_params.keys.any? { |key| %i[name birth_date context appearance outfit personality history powers hobbies fears goals relationships enemies allies other].include?(key.to_sym) }
-            prompt = generate_prompt(character_params)
-            response = ChatGPTService.new(message: prompt).call(:tp_create_character)
-            @character.update(description: response)
-          end
-          render json: { character: @character }, status: :ok
-        else
-          render json: { errors: @character.errors }, status: :unprocessable_entity
-        end
+      if @character.update(character_params)
+        render json: { character: @character }, status: :ok
+      else
+        render json: { errors: @character.errors }, status: :unprocessable_entity
+      end
     end 
 
 
@@ -53,11 +59,11 @@ class Api::V1::CharacterController < ApplicationController
     end
 
 
+    
     private
     def set_character
-      if @character = current_user.characters.find(params[:id])
-      else
-        render json: { error: "Character no found" }, status: :not_found
+      @character = current_user.characters.find_by(id: params[:id])
+      render json: { error: "Character not found" }, status: :not_found unless @character
     end
 
     def character_params

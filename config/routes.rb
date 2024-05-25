@@ -17,7 +17,17 @@ Rails.application.routes.draw do
       get "character", to: "character#show" 
       post "update_character", to: "character#update"   
       delete "delete_character", to: "character#destroy"
-
+      #Story
+      post "create_story", to: "story#create"
+      get "all_story", to: "story#index" 
+      get "story", to: "story#show" 
+      post "update_story", to: "story#update"   
+      delete "delete_story", to: "story#destroy"
+      #Review
+      post "create_review", to: "review#create"
+      put "update_review", to: "review#edit"
+      detele "delete_review", to: "review#delete"
+      get "see_review", to: "review#see"
     end
   end
 

@@ -1,5 +1,5 @@
 class Api::V1::CharacterController < ApplicationController
-    
+    before_action :set_character, only: [:update, :destroy] 
     def create
         prompt = generate_prompt(character_params)
         response = ChatGPTService.new(message: prompt).call(:tp_create_character)
@@ -17,10 +17,49 @@ class Api::V1::CharacterController < ApplicationController
             render json: { errors: character.errors }, status: :unprocessable_entity
         end
     end    
+
+    def user_characters
+        characters = @current_user.characters
     
+        if characters.present?
+          render json: characters, status: :ok
+        else
+          render json: { error: 'No characters found for the current user' }, status: :not_found
+        end
+    end
+    
+
+    def update
+        if @character.update(character_params)
+          # Solo generar un nuevo prompt si hay cambios en los campos relevantes
+          if character_params.keys.any? { |key| %i[name birth_date context appearance outfit personality history powers hobbies fears goals relationships enemies allies other].include?(key.to_sym) }
+            prompt = generate_prompt(character_params)
+            response = ChatGPTService.new(message: prompt).call(:tp_create_character)
+            @character.update(description: response)
+          end
+          render json: { character: @character }, status: :ok
+        else
+          render json: { errors: @character.errors }, status: :unprocessable_entity
+        end
+    end 
+
+
+    def destroy
+      if @character.update(state: false)
+        render json: { message: "Character eliminated successfully" }, status: :ok
+      else
+        render json: { errors: @character.errors }, status: :unprocessable_entity
+      end
+    end
 
 
     private
+    def set_character
+      if @character = current_user.characters.find(params[:id])
+      else
+        render json: { error: "Character no found" }, status: :not_found
+    end
+
     def character_params
         params.require(:character).permit(:name, :birth_date, :context, :appearance, :outfit, :personality, :history, :powers, :hobbies, :fears, :goals, :relationships, :enemies, :allies, :other)
     end
@@ -49,6 +88,6 @@ class Api::V1::CharacterController < ApplicationController
 
         prompt
     end
-    
+
       
 end

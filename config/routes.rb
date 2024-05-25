@@ -15,6 +15,13 @@ Rails.application.routes.draw do
       get "global_numbers", to: "session#global_numbers"
 
       post "create_character", to: "character#create"
+
+      get "all_characters", to: "character#user_characters" 
+
+      post "update_character", to: "character#update"   
+      
+      delete "delete_character", to: "character#destroy"
+
     end
   end
 

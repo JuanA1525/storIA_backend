@@ -26,8 +26,13 @@ Rails.application.routes.draw do
       #Review
       post "create_review", to: "review#create"
       put "update_review", to: "review#edit"
-      detele "delete_review", to: "review#delete"
+      delete "delete_review", to: "review#delete"
       get "see_review", to: "review#see"
+      #Report
+      post "create_report", to: "report#create"
+      delete "delete_report", to: "report#destroy"
+      get "reportReview", to: "report#index_by_review"
+      get "reportStory", to: "report#index_by_story"
     end
   end
 

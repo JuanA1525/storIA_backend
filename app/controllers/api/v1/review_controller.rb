@@ -54,10 +54,12 @@ class Api::V1::ReviewController < ApplicationController
   private
   def set_story
     @story = Story.find(params[:story_id])
+    render json: { error: 'Story not found' }, status: :not_found unless @story
   end
 
   def set_review
     @review = Review.find(params[:id])
+    render json: { error: 'Review not found' }, status: :not_found unless @review
   end
 
   # Only allow a list of trusted parameters through.

@@ -43,12 +43,30 @@ class Api::V1::StoryController < ApplicationController
     def index
         stories = @current_user.stories.where(state: true)
         if stories.present?
-        # Load the characters associated with each story
-        stories_with_characters = stories.includes(:characters)
+          # Load the characters, reviews, and reports associated with each story
+          stories_with_associations = stories.includes(characters: {}, reviews: :reports)
 
-        # Build a custom JSON structure that includes the associated stories and characters
-        response = stories_with_characters.as_json(include: { characters: { only: [:id, :name, :description] } }) #Here we add what will be seen of the character
-        render json: response, status: :ok
+          # Map response
+          response = stories_with_associations.as_json(include: {
+            characters: { only: [:id, :name, :description, :state] },
+            reviews: { 
+              only: [:id, :review, :user_id, :state], 
+              include: {
+                reports: { only: [:id, :report,:comment, :state] }
+              }
+            }
+          })
+
+          # Filter out characters with state != true
+          response.each do |story|
+            story["characters"].select! { |character| character["state"] }
+
+            story["reviews"].each do |review|
+              # Filter out reports with state != true
+              review["reports"].select! { |report| report["state"] }
+            end
+          end
+          render json: response, status: :ok
         else
           render json: { error: 'No stories found for current user' }, status: :not_found
         end

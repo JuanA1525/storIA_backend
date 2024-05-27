@@ -4,15 +4,15 @@ class User < ApplicationRecord
     has_many :characters
     has_many :reviews
 
-    # Validaciones para mail
-    validates :mail, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "Debe ser un correo válido." }
+    # Email validations
+    validates :mail, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "It must be a valid email." }
     normalizes :mail, with: -> (value) { value.strip.downcase }
   
-    # Validación para fecha de nacimiento
+    # Validation for date of birth
     validates :birth_date, presence: true
     validate :birth_date_in_past
   
-    # Validaciones para nombre y apellido
+    # First and last name validations.
     validates :name, presence: true
     validates :last_name, presence: true
   
@@ -20,7 +20,7 @@ class User < ApplicationRecord
   
     def birth_date_in_past
       if birth_date.present? && birth_date > 5.years.ago.to_date
-        errors.add(:birth_date, "debe ser al menos de 5 años antes de hoy")
+        errors.add(:birth_date, "must be at least 5 years before today")
       end
     end
   end

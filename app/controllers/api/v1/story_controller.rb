@@ -2,22 +2,22 @@ class Api::V1::StoryController < ApplicationController
   before_action :set_story, only: [:update, :destroy, :show]
 
   def create
-    # Verificar si se proporcionaron personajes para la historia
+    # Check if characters were provided for the story
     unless params[:characters].present?
       return render json: { error: 'Must provide at least one character for the story' }, status: :unprocessable_entity
     end
 
-    # Verificar si los personajes proporcionados existen y están asociados al usuario actual
+    # Check if the provided characters exist and are associated with the current user
     characters = Character.where(id: params[:characters], state: true).where(user_id: @current_user.id)
     if characters.count != params[:characters].count
       return render json: { error: 'Not all provided characters were found or are not associated with the current user' }, status: :unprocessable_entity
     end
     
-    # Generar el prompt para la historia
+    # Generate the prompt for the story
     prompt = generate_prompt(story_params, characters)
     response = ChatGPTService.new(message: prompt).call(:tp_create_story)
 
-    # Crear la historia con el título, contenido y personajes proporcionados
+    # Create the story with the title, content and characters provided
     story = Story.new(
       title: story_params[:title],
       content: response,
@@ -25,9 +25,9 @@ class Api::V1::StoryController < ApplicationController
       user: @current_user
     )
 
-    # Guardar la historia en la base de datos
+    # Save history to database
     if story.save
-      # Crear las relaciones entre la historia y los personajes
+      # Create relationships between story and characters
       characters.each do |character|
         StoryCharacter.create(story: story, character: character)
       end

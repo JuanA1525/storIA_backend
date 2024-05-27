@@ -1,49 +1,50 @@
 class ChatGPTService
     require "openai"
-
+  
     attr_reader :message
-
+  
     def initialize(message:)
         @message = message 
     end
-
-    def call(prompt_type)
-        messages = training_prompts(prompt_type).map do |prompt|
-            {role: "system", content: prompt}
+  
+    def call(prompt_type, character_description = nil)
+        messages = training_prompts(prompt_type, character_description).map do |prompt|
+            { role: "system", content: prompt }
         end
-
-        messages << {role: "user", content: message}
-        
-        response = test_response
-        #response = test_response(messages)
+    
+        messages << { role: "user", content: message }
+    
+        #response = test_response()
+        response = ask_response(messages)
         response
     end
-
+  
     private
+  
     def client
         @_client ||= OpenAI::Client.new(
             access_token: Rails.application.credentials.open_ai_api_key,
             log_errors: true
         )
     end
-
-    def training_prompts(prompt_type)
+  
+    def training_prompts(prompt_type, character_description = nil)
         case prompt_type
         when :tp_actlike
             [
-                "Eres un excelente actor y te gusta entrar en personaje para personalizarlos y actuar como ellos. Di si o no."
+                "Eres un excelente actor y te gusta entrar en personaje para personalizarlos y actuar como ellos. A partir de ahora actua como: #{character_description}."
             ]
         when :tp_create_scene
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increible. Di si o no.",
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increible. Di si o no."
             ]
         when :tp_create_character
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increible. Di si o no.",
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increible. Di si o no."
             ]
         when :tp_create_history
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear historias con personajes dados de manera increible. Di si o no.",
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear historias con personajes dados de manera increible. Di si o no."
             ]
         else
             [
@@ -51,15 +52,7 @@ class ChatGPTService
             ]
         end
     end
-
-    def training_prompts(prompt_type, character)
-        case prompt_type
-        when :tp_actlike
-            [
-                "Eres: " + character + ". Actua como tal."
-            ]
-    end
-
+  
     def test_response
         response = 
         {
@@ -90,16 +83,19 @@ class ChatGPTService
         response.dig("choices", 0, "message", "content")
     end
 
-    def test_response(messages)
+    def ask_response(messages)
+        puts "Messages being sent: #{messages.inspect}"
+        
         response = client.chat(
-            parameters{
+            parameters: {
                 model: "gpt-3.5-turbo",
                 messages: messages,
-                temperature: 0.7,
+                temperature: 0.7
             }
         )
-
-        puts.response.dig("choices", 0, "message", "content")
+    
+        puts response.dig("choices", 0, "message", "content")
         response.dig("choices", 0, "message", "content")
     end
 end
+  

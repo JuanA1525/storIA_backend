@@ -14,8 +14,9 @@ Rails.application.routes.draw do
       #Character
       post "create_character", to: "character#create"
       get "all_characters", to: "character#index" 
-      get "character", to: "character#show" 
-      post "update_character", to: "character#update"   
+      get "get_character", to: "character#show" 
+      get "act_like", to: "character#act_like"
+      put "update_character/:id", to: "character#update"
       delete "delete_character", to: "character#destroy"
       #Story
       post "create_story", to: "story#create"

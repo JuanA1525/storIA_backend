@@ -16,18 +16,19 @@ Rails.application.routes.draw do
       get "all_characters", to: "character#index" 
       get "get_character", to: "character#show" 
       get "act_like", to: "character#act_like"
-      put "update_character/:id", to: "character#update"
+      put "update_character", to: "character#update"
       delete "delete_character", to: "character#destroy"
       #Story
       post "create_story", to: "story#create"
       get "all_story", to: "story#index" 
       get "story", to: "story#show" 
-      post "update_story", to: "story#update"   
+      put "update_story", to: "story#update"   
       delete "delete_story", to: "story#destroy"
+      get "feed", to: "story#feed"
       #Review
       post "create_review", to: "review#create"
       put "update_review", to: "review#edit"
-      delete "delete_review", to: "review#delete"
+      delete "delete_review", to: "review#destroy"
       get "see_review", to: "review#see"
       #Report
       post "create_report", to: "report#create"

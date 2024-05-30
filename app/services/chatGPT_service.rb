@@ -7,8 +7,8 @@ class ChatGPTService
         @message = message 
     end
   
-    def call(prompt_type, character_description = nil)
-        messages = training_prompts(prompt_type, character_description).map do |prompt|
+    def call(prompt_type, character_description = nil, idioma = "español")
+        messages = training_prompts(prompt_type, character_description, idioma).map do |prompt|
             { role: "system", content: prompt }
         end
     
@@ -28,27 +28,27 @@ class ChatGPTService
         )
     end
   
-    def training_prompts(prompt_type, character_description = nil)
+    def training_prompts(prompt_type, character_description = nil, idioma = nil)
         case prompt_type
         when :tp_actlike
             [
-                "Eres un excelente actor y te gusta entrar en personaje para personalizarlos y actuar como ellos. A partir de ahora actua como: #{character_description}."
+                "Eres un excelente actor y te gusta entrar en personaje para personalizarlos y actuar como ellos. A partir de ahora actua en primera persona como si fueras: #{character_description}. \nResponde a partir de ahora en el idioma#{idioma}."
             ]
         when :tp_create_scene
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increible. Di si o no."
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear Escenarios y contextos basados en personajes y sus caracteristicas, epocas e incluso imaginando mundos de ciencia ficcion. de manera increible. \nResponde a partir de ahora en el idioma#{idioma}."
             ]
         when :tp_create_character
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increible. Di si o no."
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear personajes y sus historias de manera increible. Dame la descripcion en un texto continuo. \nResponde a partir de ahora en el idioma#{idioma}."
             ]
         when :tp_create_history
             [
-                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear historias con personajes dados de manera increible. Di si o no."
+                "Eres un escritor y creador de cuentos supremamente creativo. Con poca informacion puedes crear historias con personajes dados de manera increible. Dame la descripcion en un texto continuo."
             ]
         else
             [
-                "Eres un escritor y creador de cuentos supremamente creativo."
+                "Eres un escritor y creador de cuentos supremamente creativo. Dame la descripcion en un texto continuo."
             ]
         end
     end

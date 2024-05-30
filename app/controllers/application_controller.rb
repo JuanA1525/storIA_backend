@@ -5,9 +5,22 @@ class ApplicationController < ActionController::API
     private
         def authenticate_request
             header = request.headers['Authorization']
-            header = header.split(' ').last if header
-            decoded = jwt_decode(header)
+            unless header
+                render json: { error: 'Missing Authorization header' }, status: :unauthorized
+                return
+            end
+
+            header = header.split(' ').last
+            begin
+                decoded = jwt_decode(header)
+            rescue
+                render json: { error: 'Invalid Authorization header' }, status: :unauthorized
+                return
+            end
 
             @current_user = User.find_by(id: decoded[:user_id])
+            unless @current_user
+                render json: { error: 'Invalid user' }, status: :unauthorized
+            end
         end
 end

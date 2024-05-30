@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_21_043858) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_30_024549) do
   create_table "characters", charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.bigint "user_id", null: false
@@ -45,7 +45,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_21_043858) do
   create_table "stories", charset: "utf8mb3", force: :cascade do |t|
     t.string "title"
     t.bigint "user_id", null: false
-    t.string "content"
+    t.text "content"
     t.boolean "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

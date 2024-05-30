@@ -1,10 +1,11 @@
 class Api::V1::CharacterController < ApplicationController
-  before_action :set_character, only: [:destroy, :update, :show] 
+  before_action :set_character, only: [:act_like, :destroy, :update, :show] 
+  before_action :set_lenguage, only: [:create, :act_like]
 
   # create a character
   def create
-      prompt = generate_prompt(character_params)
-      response = ChatGPTService.new(message: prompt).call(:tp_create_character)
+      prompt = generate_prompt(character_params,  @lenguage)
+      response = ChatGPTService.new(message: prompt).call(:tp_create_character, @lenguage)
               
       character = Character.new(
           name: character_params[:name],
@@ -22,14 +23,8 @@ class Api::V1::CharacterController < ApplicationController
 
   # act like a character
   def act_like
-    character_id = params[:character_id]
-    text = params[:text]
-
-    character = Character.find_by(id: character_id, state: true)
-
-    if character
-      description = character.description
-      response = ChatGPTService.new(message: text).call(:tp_actlike, description)
+    if @character.state == true
+      response = ChatGPTService.new(message: params[:text]).call(:tp_actlike, @character.description, @lenguage)
       render json: { response: response }, status: :ok
     else
       render json: { error: 'Character not found' }, status: :not_found
@@ -78,6 +73,17 @@ class Api::V1::CharacterController < ApplicationController
   end
   
   private
+
+  def set_lenguage
+    if params[:len] == "es"
+      @lenguage = "español"
+    elsif params[:len] == "en"
+      @lenguage = "english"
+    else
+      render json: { error: "Lenguage not found" }, status: :not_found
+    end
+  end
+
   def set_character
     @character = @current_user.characters.find_by(id: params[:id])
     render json: { error: "Character not found" }, status: :not_found unless @character
@@ -91,7 +97,7 @@ class Api::V1::CharacterController < ApplicationController
     params.require(:character).permit(:name, :description)
   end
   
-  def generate_prompt(character_params)
+  def generate_prompt(character_params, lenguage = nil)
       prompt = "Crea un personaje con las siguientes características:\n"
       
       prompt << "Nombre: #{character_params[:name]}\n" if character_params[:name].present?
@@ -111,7 +117,7 @@ class Api::V1::CharacterController < ApplicationController
       prompt << "Otros Detalles: #{character_params[:other]}\n" if character_params[:other].present?
       
       prompt << "Agrega informacion que creas que haga falta para completar el personaje. Deja volar tu imaginación y crea
-      un personaje único. Trata de ser detallado pero conciso no necesito historias detalladas solo el personaje."
+      un personaje único. Trata de ser detallado pero conciso no necesito historias detalladas solo el personaje. \nResponde en el idioma: #{lenguage}."
 
       prompt
   end

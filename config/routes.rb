@@ -33,8 +33,8 @@ Rails.application.routes.draw do
       #Report
       post "create_report", to: "report#create"
       delete "delete_report", to: "report#destroy"
-      get "reportReview", to: "report#index_by_review"
-      get "reportStory", to: "report#index_by_story"
+      get "report_review", to: "report#index_by_review"
+      get "report_story", to: "report#index_by_story"
     end
   end
 

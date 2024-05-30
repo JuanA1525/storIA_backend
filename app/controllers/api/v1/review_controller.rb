@@ -20,7 +20,6 @@ class Api::V1::ReviewController < ApplicationController
       render json: { error: 'Story no founded' }, status: :unprocessable_entity
     end
   end
-  
 
   # PUT 
   def edit
@@ -43,9 +42,12 @@ class Api::V1::ReviewController < ApplicationController
 
   # GET 
   def see
-    reviews = @current_user.reviews.where(state: true, story_id:@story)
+    reviews = @current_user.reviews.where(state: true, story_id: @story).includes(:reports)
     if reviews.present?
-      render json: reviews, status: :ok
+      response = reviews.as_json(include: {
+        reports: { only: [:id, :report, :comment, :state] }
+      })
+      render json: response, status: :ok
     else
       render json: { error: 'No reviews found for the current user' }, status: :not_found
     end

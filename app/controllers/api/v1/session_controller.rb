@@ -25,4 +25,12 @@ class Api::V1::SessionController < ApplicationController
             num_characters: 598000
         }
     end
+
+    def current_user_info
+        if @current_user
+          render json: @current_user, status: :ok
+        else
+          render json: { error: 'No current user' }, status: :not_found
+        end
+      end
 end 

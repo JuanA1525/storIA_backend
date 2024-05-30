@@ -85,7 +85,7 @@ class Api::V1::CharacterController < ApplicationController
   end
 
   def set_character
-    @character = Characters.find_by(id: params[:id])
+    @character = Character.find_by(id: params[:id])
     render json: { error: "Character not found" }, status: :not_found unless @character
   end
 

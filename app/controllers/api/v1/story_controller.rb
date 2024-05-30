@@ -161,8 +161,8 @@ class Api::V1::StoryController < ApplicationController
   end
 
   def set_story
-    @story = @current_user.stories.find_by(id: params[:id])
-    render json: { error: 'History not found' }, status: :not_found unless @story
+    @story = Story.find_by(id: params[:id])
+    render json: { error: 'Story not found' }, status: :not_found unless @story
   end
 
   def story_params

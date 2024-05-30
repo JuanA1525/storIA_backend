@@ -42,7 +42,7 @@ class Api::V1::ReviewController < ApplicationController
 
   # GET 
   def see
-    reviews = @current_user.reviews.where(state: true, story_id: @story).includes(:reports)
+    reviews = Reviews.where(state: true, story_id: @story).includes(:reports)
     if reviews.present?
       response = reviews.as_json(include: {
         reports: { only: [:id, :report, :comment, :state] }

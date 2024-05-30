@@ -35,7 +35,10 @@ class Api::V1::CharacterController < ApplicationController
   def index
     characters = @current_user.characters.where(state: true)
     if characters.present?
-      render json: characters, status: :ok
+      response = characters.as_json(include: {
+        user: { only: [:id, :name, :last_name, :mail] }
+      })
+      render json: response, status: :ok
     else
       render json: { error: 'No characters found for the current user' }, status: :not_found
     end
@@ -44,7 +47,10 @@ class Api::V1::CharacterController < ApplicationController
   # observe the information of a specific character
   def show
     if @character.state==true
-      render json: @character, status: :ok
+      response = @character.as_json(include: {
+        user: { only: [:id, :name, :last_name, :mail] }
+      })
+      render json: response, status: :ok
     else
       render json: { error: 'Character not found' }, status: :not_found
     end

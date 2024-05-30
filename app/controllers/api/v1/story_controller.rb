@@ -49,14 +49,16 @@ class Api::V1::StoryController < ApplicationController
     stories = @current_user.stories.where(state: true)
     if stories.present?
       # Load the characters, reviews, and reports associated with each story
-      stories_with_associations = stories.includes(characters: {}, reviews: :reports)
+      stories_with_associations = stories.includes(characters: {}, reviews: [:user, :reports])
 
       # Map response
       response = stories_with_associations.as_json(include: {
+        user: { only: [:id, :name, :last_name, :mail] },
         characters: { only: [:id, :name, :description, :state] },
         reviews: { 
-          only: [:id, :review, :user_id, :state], 
+          only: [:id, :review, :state], 
           include: {
+            user: { only: [:id, :name, :last_name, :mail] },
             reports: { only: [:id, :report,:comment, :state] }
           }
         }
@@ -86,9 +88,12 @@ class Api::V1::StoryController < ApplicationController
         review.reports = review.reports.where(state: true)
       end
       response = {
-        story: @story,
+        story: @story.as_json(include: {
+          user: { only: [:id, :name, :last_name, :mail] }
+        }),
         characters: characters,
         reviews: reviews.as_json(include: {
+          user: { only: [:id, :name, :last_name, :mail] },
           reports: { only: [:id, :report, :comment, :state] }
         })
       }
@@ -121,23 +126,25 @@ class Api::V1::StoryController < ApplicationController
     stories = Story.where.not(user_id: @current_user.id).where(state: true)
     if stories.present?
       # Load the characters, reviews, and reports associated with each story
-      stories_with_associations = stories.includes(characters: {}, reviews: :reports)
-
+      stories_with_associations = stories.includes(:user, characters: {}, reviews: [:user, :reports])
+  
       # Map response
       response = stories_with_associations.as_json(include: {
+        user: { only: [:id, :name, :last_name, :mail] },
         characters: { only: [:id, :name, :description, :state] },
         reviews: { 
-          only: [:id, :review, :user_id, :state], 
+          only: [:id, :review, :state], 
           include: {
+            user: { only: [:id, :name, :last_name, :mail] },
             reports: { only: [:id, :report,:comment, :state] }
           }
         }
       })
-
+  
       # Filter out characters with state != true
       response.each do |story|
         story["characters"].select! { |character| character["state"] }
-
+  
         story["reviews"].each do |review|
           # Filter out reports with state != true
           review["reports"].select! { |report| report["state"] }
@@ -147,7 +154,7 @@ class Api::V1::StoryController < ApplicationController
     else
       render json: { error: 'No stories found' }, status: :not_found
     end
-  end 
+  end
 
   private
   def set_lenguage
